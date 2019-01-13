@@ -21,6 +21,10 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
         env:
           - name: DB_HOST
             value: 127.0.0.1:3306
@@ -42,20 +46,20 @@ spec:
       # of your Cloud SQL instance. The format is
       # $PROJECT:$REGION:$INSTANCE
       # [START proxy_container]
-      - name: cloudsql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.11
-        command: ["/cloud_sql_proxy",
-                  "-instances=beemob-test:asia-southeast1:becastle-data=tcp:3306",
-                  "-credential_file=/secrets/cloudsql/credentials.json"]
-        # [START cloudsql_security_context]
-        securityContext:
-          runAsUser: 2  # non-root user
-          allowPrivilegeEscalation: false
-        # [END cloudsql_security_context]
-        volumeMounts:
-          - name: cloudsql-instance-credentials
-            mountPath: /secrets/cloudsql
-            readOnly: true
+#      - name: cloudsql-proxy
+#        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+#        command: ["/cloud_sql_proxy",
+#                  "-instances=beemob-test:asia-southeast1:becastle-data=tcp:3306",
+#                  "-credential_file=/secrets/cloudsql/credentials.json"]
+#        # [START cloudsql_security_context]
+#        securityContext:
+#          runAsUser: 2  # non-root user
+#          allowPrivilegeEscalation: false
+#        # [END cloudsql_security_context]
+#        volumeMounts:
+#          - name: cloudsql-instance-credentials
+#            mountPath: /secrets/cloudsql
+#            readOnly: true
       # [END proxy_container]
         ports:
         - containerPort: {{ .Values.service.internalPort }}
